@@ -59,11 +59,11 @@ export default class RunningLine {
   setItemsStyleProperties() {
     this.wrapper.style.setProperty('overflow', 'hidden');
     this.list.style.setProperty('position', 'relative');
-    this.listWidth = this.targets.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
     this.targets.forEach((target) => {
       target.style.setProperty('position', 'absolute');
       target.style.setProperty('display', 'inline-block');
     });
+    this.listWidth = this.targets.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
     this.list.style.setProperty('width', `${this.listWidth}px`);
   }
 

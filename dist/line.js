@@ -73,10 +73,11 @@ var RunningLine = function () {
       this.listWidth = this.targets.reduce(function (sum, el) {
         return sum + el.getBoundingClientRect().width;
       }, 0);
-      this.list.style.setProperty('width', this.listWidth + 'px');
       this.targets.forEach(function (target) {
         target.style.setProperty('position', 'absolute');
+        target.style.setProperty('display', 'inline-block');
       });
+      this.list.style.setProperty('width', this.listWidth + 'px');
     }
   }, {
     key: 'fixGap',
