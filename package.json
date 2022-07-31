@@ -1,14 +1,15 @@
 {
   "name": "running-line",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "JS running-line widget",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run lint && babel ./src -d ./dist",
+    "prepublishOnly": "npm run build",
     "lint": "eslint ./src"
   },
-  "prepublishOnly": "npm run build",
+  
   "author": "Eugen Tokarev",
   "license": "MIT",
   "dependencies": {
