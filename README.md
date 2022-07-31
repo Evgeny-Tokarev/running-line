@@ -1,2 +1,2 @@
 # running-line
-running-line javaScript vidger
+running-line javaScript vidget
