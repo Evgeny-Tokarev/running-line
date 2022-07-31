@@ -1,6 +1,6 @@
 {
   "name": "running-line",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "JS running-line widget",
   "main": "index.js",
   "scripts": {
