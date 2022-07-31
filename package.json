@@ -1,0 +1,25 @@
+{
+  "name": "running-line",
+  "version": "1.0.0",
+  "description": "JS running-line widget",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run lint && babel ./src -d ./dist",
+    "lint": "eslint ./src"
+  },
+  "author": "Eugen Tokarev",
+  "license": "ISC",
+  "dependencies": {
+    "animejs": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.18.9",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^8.20.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^2.7.1"
+  }
+}
