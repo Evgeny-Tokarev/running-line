@@ -1,6 +1,6 @@
 {
   "name": "running-line",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JS running-line widget",
   "main": "index.js",
   "scripts": {
@@ -8,8 +8,9 @@
     "build": "npm run lint && babel ./src -d ./dist",
     "lint": "eslint ./src"
   },
+  "prepublishOnly": "npm run build",
   "author": "Eugen Tokarev",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "animejs": "^3.2.1"
   },
