@@ -41,6 +41,9 @@ export default class RunningLine {
       target.addEventListener('mouseout', this.startAllAnimations.bind(this));
       this.observer.observe(target);
     });
+    this.animations.forEach((animation) => {
+      animation.remove()
+    })
     let resizeTimer;
     window.addEventListener('resize', () => {
       if (resizeTimer) {
@@ -58,6 +61,7 @@ export default class RunningLine {
     this.targets.forEach((target) => {
       target.removeEventListener('mouseover', this.stopAllAnimations.bind(this));
       target.removeEventListener('mouseout', this.startAllAnimations.bind(this));
+      this.observer.unobserve(target);
     });
     this.animations = [];
     this.wrapper = null;
