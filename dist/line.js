@@ -51,6 +51,9 @@ var RunningLine = function () {
         target.addEventListener('mouseout', _this.startAllAnimations.bind(_this));
         _this.observer.observe(target);
       });
+      this.animations.forEach(function (animation) {
+        animation.remove();
+      });
       var resizeTimer = void 0;
       window.addEventListener('resize', function () {
         if (resizeTimer) {
@@ -71,6 +74,7 @@ var RunningLine = function () {
       this.targets.forEach(function (target) {
         target.removeEventListener('mouseover', _this2.stopAllAnimations.bind(_this2));
         target.removeEventListener('mouseout', _this2.startAllAnimations.bind(_this2));
+        _this2.observer.unobserve(target);
       });
       this.animations = [];
       this.wrapper = null;

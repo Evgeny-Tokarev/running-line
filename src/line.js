@@ -42,8 +42,8 @@ export default class RunningLine {
       this.observer.observe(target);
     });
     this.animations.forEach((animation) => {
-      animation.remove()
-    })
+      animation.remove();
+    });
     let resizeTimer;
     window.addEventListener('resize', () => {
       if (resizeTimer) {
@@ -61,7 +61,12 @@ export default class RunningLine {
     this.targets.forEach((target) => {
       target.removeEventListener('mouseover', this.stopAllAnimations.bind(this));
       target.removeEventListener('mouseout', this.startAllAnimations.bind(this));
-      this.observer.unobserve(target);
+      if (this.observer) {
+        this.observer.unobserve(target);
+      }
+    });
+    this.animations.forEach((animation) => {
+      animation.remove();
     });
     this.animations = [];
     this.wrapper = null;
@@ -73,14 +78,14 @@ export default class RunningLine {
     this.listWidth = 0;
     this.targets = [];
     this.current = 0;
-    this.list.style.setProperty('width', `0`);
   }
 
   createWideWrapper() {
     this.wideWrapper = document.createElement('div');
+    this.wrapper.appendChild(this.wideWrapper);
     this.wideWrapper.style.setProperty('width', `${this.maxItemWidth}px`);
-    tthis.wrapper.style.setProperty('overflow', 'hidden');
-    this.list.style.setProperty('position', 'relative');
+    this.wrapper.style.setProperty('overflow', 'hidden');
+    this.wideWrapper.style.setProperty('position', 'relative');
   }
   setItemsStyleProperties() {
     if (this.maxItemWidth > this.wrapper.getBoundingClientRect().width) {
