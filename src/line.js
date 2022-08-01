@@ -4,6 +4,7 @@ export default class RunningLine {
   constructor(duration, rightDirection) {
     this.animations = [];
     this.wrapper = null;
+    this.wideWrapper = null;
     this.list = null;
     this.observer = null;
     this.duration = duration;
@@ -24,8 +25,8 @@ export default class RunningLine {
       console.error(er);
       return;
     }
-    this.setItemsStyleProperties();
     this.maxItemWidth = this.getMaxTargetWidth();
+    this.setItemsStyleProperties();
     this.moveItemsToStartPosition();
     this.fixGap();
 
@@ -46,19 +47,45 @@ export default class RunningLine {
         clearTimeout(resizeTimer);
       }
       resizeTimer = setTimeout(() => {
-        this.targets.forEach((target) => {
-          target.removeEventListener('mouseover', this.stopAllAnimations.bind(this));
-          target.removeEventListener('mouseout', this.startAllAnimations.bind(this));
-        });
+        this.reset();
         this.init(selector);
       }, 250);
     });
     this.animate(this.targets[this.current]);
   }
 
-  setItemsStyleProperties() {
-    this.wrapper.style.setProperty('overflow', 'hidden');
+  reset() {
+    this.targets.forEach((target) => {
+      target.removeEventListener('mouseover', this.stopAllAnimations.bind(this));
+      target.removeEventListener('mouseout', this.startAllAnimations.bind(this));
+    });
+    this.animations = [];
+    this.wrapper = null;
+    this.wideWrapper = null;
+    this.list = null;
+    this.observer = null;
+    this.duration = duration;
+    this.wrapperWidth = 0;
+    this.listWidth = 0;
+    this.targets = [];
+    this.current = 0;
+    this.list.style.setProperty('width', `0`);
+  }
+
+  createWideWrapper() {
+    this.wideWrapper = document.createElement('div');
+    this.wideWrapper.style.setProperty('width', `${this.maxItemWidth}px`);
+    tthis.wrapper.style.setProperty('overflow', 'hidden');
     this.list.style.setProperty('position', 'relative');
+  }
+  setItemsStyleProperties() {
+    if (this.maxItemWidth > this.wrapper.getBoundingClientRect().width) {
+      this.createWideWrapper();
+    } else {
+      this.wrapper.style.setProperty('overflow', 'hidden');
+      this.list.style.setProperty('position', 'relative');
+    }
+
     this.targets.forEach((target) => {
       target.style.setProperty('position', 'absolute');
       target.style.setProperty('display', 'inline-block');
@@ -80,7 +107,6 @@ export default class RunningLine {
           .getComputedStyle(target)
           .getPropertyValue('padding-right')
           .replace(/\w+/, '');
-        console.log('fixing', this.maxItemWidth, oldLeftpadding, fixWidth);
         target.style.setProperty('padding-right', `${oldRightpadding + fixWidth}px`);
         target.style.setProperty('padding-left', `${oldLeftpadding + fixWidth}px`);
       });

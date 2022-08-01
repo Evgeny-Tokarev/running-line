@@ -60,23 +60,30 @@ var RunningLine = function () {
             target.removeEventListener('mouseover', _this.stopAllAnimations.bind(_this));
             target.removeEventListener('mouseout', _this.startAllAnimations.bind(_this));
           });
+          _this.reset();
           _this.init(selector);
         }, 250);
       });
       this.animate(this.targets[this.current]);
     }
   }, {
+    key: 'reset',
+    value: function reset() {
+      this.listWidth = 0;
+      this.list.style.setProperty('width', '0');
+    }
+  }, {
     key: 'setItemsStyleProperties',
     value: function setItemsStyleProperties() {
       this.wrapper.style.setProperty('overflow', 'hidden');
       this.list.style.setProperty('position', 'relative');
-      this.listWidth = this.targets.reduce(function (sum, el) {
-        return sum + el.getBoundingClientRect().width;
-      }, 0);
       this.targets.forEach(function (target) {
         target.style.setProperty('position', 'absolute');
         target.style.setProperty('display', 'inline-block');
       });
+      this.listWidth = this.targets.reduce(function (sum, el) {
+        return sum + el.getBoundingClientRect().width;
+      }, 0);
       this.list.style.setProperty('width', this.listWidth + 'px');
     }
   }, {
