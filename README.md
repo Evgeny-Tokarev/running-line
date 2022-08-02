@@ -33,8 +33,8 @@ You can use other html tags, but it is important to keep the structure inheritan
 JavaScript:
 
 
-> const line = new RunningLine(12000, true, true, true)
-> line.runLine("#myLine")
+     const line = new RunningLine(12000, true, true, true)
+     line.runLine("#myLine")
 
 
 Parameters:
