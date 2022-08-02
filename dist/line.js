@@ -5,98 +5,159 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 import anime from 'animejs/lib/anime';
 
 var RunningLine = function () {
-  function RunningLine(duration, rightDirection) {
+  function RunningLine(duration, rightDirection, hoverStop, allocate) {
     _classCallCheck(this, RunningLine);
 
+    this.initialWidth = 0;
     this.animations = [];
     this.wrapper = null;
     this.list = null;
     this.observer = null;
-    this.duration = duration;
+    this.duration = duration || 5000;
+    this.overlay = null;
     this.wrapperWidth = 0;
+    this.wrapperHeight = 0;
     this.listWidth = 0;
-    this.targets = [];
+    this.runningElements = [];
     this.current = 0;
     this.rightDirection = rightDirection || false;
+    this.hoverStop = hoverStop || false;
+    this.allocate = allocate || false;
   }
 
   _createClass(RunningLine, [{
-    key: 'init',
-    value: function init(selector) {
-
+    key: 'runLine',
+    value: function runLine(selector) {
       var _this = this;
 
       try {
-        this.wrapper = document.querySelector(selector);
-        this.wrapperWidth = this.wrapper.getBoundingClientRect().width;
+        this.overlay = document.querySelector(selector);
+        this.wrapper = this.overlay.firstElementChild;
         this.list = this.wrapper.firstElementChild;
-        this.targets = Array.from(this.list.children);
+        this.runningElements = Array.from(this.list.children);
       } catch (er) {
         console.error(er);
-        return;
       }
-      this.setItemsStyleProperties();
+      this.makeRunningElementsFoolWidth();
+      this.wrapperWidth = this.overlay.getBoundingClientRect().width;
+      this.wrapperHeight = this.overlay.getBoundingClientRect().height;
+      this.initialWidth = this.wrapperWidth;
       this.maxItemWidth = this.getMaxTargetWidth();
+      this.setItemsStyleProperties();
       this.moveItemsToStartPosition();
-      this.fixGap();
-
-      this.current = !this.rightDirection ? this.targets.length - 1 : 0;
+      if (this.wrapperWidth > this.listWidth - this.maxItemWidth && this.allocate) {
+        this.fixGap();
+      }
+      this.current = !this.rightDirection ? this.runningElements.length - 1 : 0;
       this.observer = new IntersectionObserver(this.intersectionHandler.bind(this), {
         root: this.wrapper,
         rootMargin: '0px',
         threshold: [1]
       });
-      this.targets.forEach(function (target) {
-        target.addEventListener('mouseover', _this.stopAllAnimations.bind(_this));
-        target.addEventListener('mouseout', _this.startAllAnimations.bind(_this));
-        _this.observer.observe(target);
+      this.runningElements.forEach(function (runningElement) {
+        _this.observer.observe(runningElement);
       });
+      if (this.hoverStop) this.setHoverListeners();
+
       var resizeTimer = void 0;
       window.addEventListener('resize', function () {
         if (resizeTimer) {
           clearTimeout(resizeTimer);
         }
         resizeTimer = setTimeout(function () {
-          console.log(_this)
-          _this.targets.forEach(function (target) {
-            target.removeEventListener('mouseover', _this.stopAllAnimations.bind(_this));
-            target.removeEventListener('mouseout', _this.startAllAnimations.bind(_this));
-          });
-          
-          _this.init(selector);
-        }, 250);
+          _this.reset();
+          _this.runLine(selector);
+        }, 500);
       });
-      this.animate(this.targets[this.current]);
+      this.animate(this.runningElements[this.current]);
+    }
+  }, {
+    key: 'setHoverListeners',
+    value: function setHoverListeners() {
+      var _this2 = this;
+
+      this.runningElements.forEach(function (runningElement) {
+        runningElement.addEventListener('mouseover', _this2.stopAllAnimations.bind(_this2));
+        runningElement.addEventListener('mouseout', _this2.startAllAnimations.bind(_this2));
+      });
+    }
+  }, {
+    key: 'makeRunningElementsFoolWidth',
+    value: function makeRunningElementsFoolWidth() {
+      this.list.style.setProperty('display', 'flex');
+      this.runningElements.forEach(function (runningElement) {
+        runningElement.style.setProperty('flex', '1 0 auto');
+      });
+    }
+  }, {
+    key: 'reset',
+    value: function reset() {
+      var _this3 = this;
+
+      this.runningElements.forEach(function (runningElement) {
+        runningElement.removeEventListener('mouseover', _this3.stopAllAnimations.bind(_this3));
+        runningElement.removeEventListener('mouseout', _this3.startAllAnimations.bind(_this3));
+        if (_this3.observer) {
+          _this3.observer.unobserve(runningElement);
+        }
+      });
+      this.animations.forEach(function (animation) {
+        if (animation) {
+          anime.set(animation.animatables[0].target, {
+            translateX: 0
+          });
+          animation.remove(animation.animatables[0].target);
+        }
+      });
+      this.overlay.style.setProperty('width', this.initialWidth + 'px');
+      this.animations = [];
+      this.wrapper = null;
+      this.list = null;
+      this.observer = null;
+      this.wrapperWidth = 0;
+      this.wrapperHeight = 0;
+      this.listWidth = 0;
+      this.runningElements = [];
+      this.current = 0;
+    }
+  }, {
+    key: 'createOverlay',
+    value: function createOverlay() {
+      this.overlay.style.setProperty('width', this.wrapper + 'px');
+      this.wrapper.style.setProperty('width', this.maxItemWidth + 5 + 'px');
+      this.overlay.style.setProperty('overflow', 'hidden');
+      this.wrapperWidth = this.wrapper.getBoundingClientRect().width;
     }
   }, {
     key: 'setItemsStyleProperties',
     value: function setItemsStyleProperties() {
-      this.wrapper.style.setProperty('overflow', 'hidden');
+      if (this.maxItemWidth > this.wrapperWidth) {
+        this.createOverlay();
+      } else {
+        this.wrapper.style.setProperty('overflow', 'hidden');
+      }
       this.list.style.setProperty('position', 'relative');
-      this.targets.forEach(function (target) {
-        target.style.setProperty('position', 'absolute');
-        target.style.setProperty('display', 'inline-block');
-      });
-      this.listWidth = this.targets.reduce(function (sum, el) {
+      this.list.style.setProperty('height', this.wrapperHeight + 'px');
+      this.list.style.setProperty('margin', '0');
+      this.list.style.setProperty('padding', '0');
+      this.listWidth = this.runningElements.reduce(function (sum, el) {
         return sum + el.getBoundingClientRect().width;
       }, 0);
+      this.runningElements.forEach(function (el) {
+        el.style.setProperty('position', 'absolute');
+      });
       this.list.style.setProperty('width', this.listWidth + 'px');
     }
   }, {
     key: 'fixGap',
     value: function fixGap() {
-      var _this2 = this;
-
-      var fixWidth = (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (2 * (this.targets.length - 1));
-      if (this.wrapperWidth > this.listWidth - this.maxItemWidth) {
-        this.targets.forEach(function (target) {
-          var oldLeftpadding = +window.getComputedStyle(target).getPropertyValue('padding-left').replace(/\w+/, '');
-          var oldRightpadding = +window.getComputedStyle(target).getPropertyValue('padding-right').replace(/\w+/, '');
-          console.log('fixing', _this2.maxItemWidth, oldLeftpadding, fixWidth);
-          target.style.setProperty('padding-right', oldRightpadding + fixWidth + 'px');
-          target.style.setProperty('padding-left', oldLeftpadding + fixWidth + 'px');
-        });
-      }
+      var fixWidth = (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (2 * (this.runningElements.length - 1));
+      this.runningElements.forEach(function (runningElement) {
+        var oldLeftpadding = +window.getComputedStyle(runningElement).getPropertyValue('padding-left').replace(/\w+/, '');
+        var oldRightpadding = +window.getComputedStyle(runningElement).getPropertyValue('padding-right').replace(/\w+/, '');
+        runningElement.style.setProperty('padding-right', oldRightpadding + fixWidth + 'px');
+        runningElement.style.setProperty('padding-left', oldLeftpadding + fixWidth + 'px');
+      });
     }
   }, {
     key: 'moveItemsToStartPosition',
@@ -105,33 +166,32 @@ var RunningLine = function () {
         this.list.style.setProperty('right', -this.wrapperWidth + 'px');
       } else {
         this.list.style.setProperty('left', -this.listWidth + 'px');
-        this.targets.forEach(function (target) {
-          target.style.setProperty('right', '0');
+        this.runningElements.forEach(function (runningElement) {
+          runningElement.style.setProperty('right', '0');
         });
       }
     }
   }, {
     key: 'intersectionHandler',
     value: function intersectionHandler(entries) {
-      var _this3 = this;
+      var _this4 = this;
 
       entries.forEach(function (entry) {
         if (entry && entry.isIntersecting) {
-          if (!_this3.rightDirection) {
-            _this3.current = _this3.current > 0 ? _this3.current - 1 : _this3.targets.length - 1;
+          if (!_this4.rightDirection) {
+            _this4.current = _this4.current > 0 ? _this4.current - 1 : _this4.runningElements.length - 1;
           } else {
-            _this3.current = _this3.current < _this3.targets.length - 1 ? _this3.current + 1 : 0;
+            _this4.current = _this4.current < _this4.runningElements.length - 1 ? _this4.current + 1 : 0;
           }
-
-          if (!_this3.animations[_this3.current]) {
-            _this3.animate(_this3.targets[_this3.current]);
-          } else if (_this3.animations[_this3.current].completed) {
-            _this3.animations[_this3.current].restart();
+          if (!_this4.animations[_this4.current]) {
+            _this4.animate(_this4.runningElements[_this4.current]);
+          } else if (_this4.animations[_this4.current].completed) {
+            _this4.animations[_this4.current].restart();
           } else {
-            _this3.animations[_this3.current].finished.then(function () {
-              _this3.animations[_this3.current].restart();
+            _this4.animations[_this4.current].finished.then(function () {
+              _this4.animations[_this4.current].restart();
             }, function (reason) {
-              console.log(reason);
+              console.error(reason);
             });
           }
         }
@@ -139,7 +199,7 @@ var RunningLine = function () {
     }
   }, {
     key: 'animate',
-    value: function animate(target) {
+    value: function animate(runningElement) {
       var _getWidthAndDuration = this.getWidthAndDuration(),
           width = _getWidthAndDuration.width;
 
@@ -148,7 +208,7 @@ var RunningLine = function () {
 
       width = !this.rightDirection ? width : -width;
       this.animations[this.current] = anime({
-        targets: target,
+        targets: runningElement,
         easing: 'linear',
         loop: 0,
         keyframes: [{ translateX: width, duration: duration }, { translateX: 0, duration: 0 }]
@@ -157,15 +217,14 @@ var RunningLine = function () {
   }, {
     key: 'getMaxTargetWidth',
     value: function getMaxTargetWidth() {
-      return this.targets.reduce(function (max, el) {
-        console.log(max, el.getBoundingClientRect().width);
+      return this.runningElements.reduce(function (max, el) {
         return max < el.getBoundingClientRect().width ? el.getBoundingClientRect().width : max;
       }, 0);
     }
   }, {
     key: 'getCurrentWidth',
     value: function getCurrentWidth() {
-      return this.targets[this.current].getBoundingClientRect().width;
+      return this.runningElements[this.current].getBoundingClientRect().width;
     }
   }, {
     key: 'getWidthAndDuration',
