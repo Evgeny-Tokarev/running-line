@@ -1,7 +1,8 @@
 {
   "name": "running-line",
-  "version": "1.2.1",
+  "version": "^2.0.0",
   "description": "JS running-line widget",
+  "repository": "https://github.com/Evgeny-Tokarev/running-line",
   "main": "dist/line.js",
   "type": "module",
   "scripts": {
@@ -10,9 +11,12 @@
     "prepublishOnly": "npm run build",
     "lint": "eslint ./src"
   },
-  
   "author": "Eugen Tokarev",
   "license": "MIT",
+  "keywords": [
+    "running-line",
+    "widget"
+  ],
   "dependencies": {
     "animejs": "^3.2.1"
   },

@@ -10,7 +10,6 @@ var RunningLine = function () {
 
     this.animations = [];
     this.wrapper = null;
-    this.wideWrapper = null;
     this.list = null;
     this.observer = null;
     this.duration = duration;
@@ -24,6 +23,7 @@ var RunningLine = function () {
   _createClass(RunningLine, [{
     key: 'init',
     value: function init(selector) {
+
       var _this = this;
 
       try {
@@ -35,8 +35,8 @@ var RunningLine = function () {
         console.error(er);
         return;
       }
-      this.maxItemWidth = this.getMaxTargetWidth();
       this.setItemsStyleProperties();
+      this.maxItemWidth = this.getMaxTargetWidth();
       this.moveItemsToStartPosition();
       this.fixGap();
 
@@ -51,61 +51,28 @@ var RunningLine = function () {
         target.addEventListener('mouseout', _this.startAllAnimations.bind(_this));
         _this.observer.observe(target);
       });
-      this.animations.forEach(function (animation) {
-        animation.remove();
-      });
       var resizeTimer = void 0;
       window.addEventListener('resize', function () {
         if (resizeTimer) {
           clearTimeout(resizeTimer);
         }
         resizeTimer = setTimeout(function () {
-          _this.reset();
+          console.log(_this)
+          _this.targets.forEach(function (target) {
+            target.removeEventListener('mouseover', _this.stopAllAnimations.bind(_this));
+            target.removeEventListener('mouseout', _this.startAllAnimations.bind(_this));
+          });
+          
           _this.init(selector);
         }, 250);
       });
       this.animate(this.targets[this.current]);
     }
   }, {
-    key: 'reset',
-    value: function reset() {
-      var _this2 = this;
-
-      this.targets.forEach(function (target) {
-        target.removeEventListener('mouseover', _this2.stopAllAnimations.bind(_this2));
-        target.removeEventListener('mouseout', _this2.startAllAnimations.bind(_this2));
-        _this2.observer.unobserve(target);
-      });
-      this.animations = [];
-      this.wrapper = null;
-      this.wideWrapper = null;
-      this.list = null;
-      this.observer = null;
-      this.duration = duration;
-      this.wrapperWidth = 0;
-      this.listWidth = 0;
-      this.targets = [];
-      this.current = 0;
-      this.list.style.setProperty('width', '0');
-    }
-  }, {
-    key: 'createWideWrapper',
-    value: function createWideWrapper() {
-      this.wideWrapper = document.createElement('div');
-      this.wideWrapper.style.setProperty('width', this.maxItemWidth + 'px');
-      tthis.wrapper.style.setProperty('overflow', 'hidden');
-      this.list.style.setProperty('position', 'relative');
-    }
-  }, {
     key: 'setItemsStyleProperties',
     value: function setItemsStyleProperties() {
-      if (this.maxItemWidth > this.wrapper.getBoundingClientRect().width) {
-        this.createWideWrapper();
-      } else {
-        this.wrapper.style.setProperty('overflow', 'hidden');
-        this.list.style.setProperty('position', 'relative');
-      }
-
+      this.wrapper.style.setProperty('overflow', 'hidden');
+      this.list.style.setProperty('position', 'relative');
       this.targets.forEach(function (target) {
         target.style.setProperty('position', 'absolute');
         target.style.setProperty('display', 'inline-block');
@@ -118,11 +85,14 @@ var RunningLine = function () {
   }, {
     key: 'fixGap',
     value: function fixGap() {
+      var _this2 = this;
+
       var fixWidth = (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (2 * (this.targets.length - 1));
       if (this.wrapperWidth > this.listWidth - this.maxItemWidth) {
         this.targets.forEach(function (target) {
           var oldLeftpadding = +window.getComputedStyle(target).getPropertyValue('padding-left').replace(/\w+/, '');
           var oldRightpadding = +window.getComputedStyle(target).getPropertyValue('padding-right').replace(/\w+/, '');
+          console.log('fixing', _this2.maxItemWidth, oldLeftpadding, fixWidth);
           target.style.setProperty('padding-right', oldRightpadding + fixWidth + 'px');
           target.style.setProperty('padding-left', oldLeftpadding + fixWidth + 'px');
         });
