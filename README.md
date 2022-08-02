@@ -11,21 +11,21 @@
 
 Html:
 
-> <div id="myLine">
->   <div>
->     <ul>
->       <li>
->         <a href="#">First item text</a>
->       </li>
->       <li>
->         <a href="#">Second item text</a>
->       </li>
->       <li>
->         <a href="#">Third item text</a>
->       </li>
->     </ul>
->   </div>
-> </div>   
+     <div id="myLine">
+       <div>
+         <ul>
+           <li>
+             <a href="#">First item text</a>
+           </li>
+           <li>
+             <a href="#">Second item text</a>
+           </li>
+           <li>
+             <a href="#">Third item text</a>
+           </li>
+         </ul>
+       </div>
+     </div>   
 
 
 You can use other html tags, but it is important to keep the structure inheritance, however "li" elements may not contain any child elements.
