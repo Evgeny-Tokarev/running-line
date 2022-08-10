@@ -1,6 +1,6 @@
 {
   "name": "running-line",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "JS running-line widget",
   "repository": "https://github.com/Evgeny-Tokarev/running-line",
   "main": "dist/line.js",
