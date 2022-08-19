@@ -26,7 +26,7 @@ var RunningLine = function () {
   }
 
   _createClass(RunningLine, [{
-    key: 'runLine',
+    key: "runLine",
     value: function runLine(selector) {
       var _this = this;
 
@@ -37,6 +37,7 @@ var RunningLine = function () {
         this.runningElements = Array.from(this.list.children);
       } catch (er) {
         console.error(er);
+        return;
       }
       this.makeRunningElementsFoolWidth();
       this.wrapperWidth = this.overlay.getBoundingClientRect().width;
@@ -51,7 +52,7 @@ var RunningLine = function () {
       this.current = !this.rightDirection ? this.runningElements.length - 1 : 0;
       this.observer = new IntersectionObserver(this.intersectionHandler.bind(this), {
         root: this.wrapper,
-        rootMargin: '0px',
+        rootMargin: "0px",
         threshold: [1]
       });
       this.runningElements.forEach(function (runningElement) {
@@ -60,7 +61,7 @@ var RunningLine = function () {
       if (this.hoverStop) this.setHoverListeners();
 
       var resizeTimer = void 0;
-      window.addEventListener('resize', function () {
+      window.addEventListener("resize", function () {
         if (resizeTimer) {
           clearTimeout(resizeTimer);
         }
@@ -72,31 +73,31 @@ var RunningLine = function () {
       this.animate(this.runningElements[this.current]);
     }
   }, {
-    key: 'setHoverListeners',
+    key: "setHoverListeners",
     value: function setHoverListeners() {
       var _this2 = this;
 
       this.runningElements.forEach(function (runningElement) {
-        runningElement.addEventListener('mouseover', _this2.stopAllAnimations.bind(_this2));
-        runningElement.addEventListener('mouseout', _this2.startAllAnimations.bind(_this2));
+        runningElement.addEventListener("mouseover", _this2.stopAllAnimations.bind(_this2));
+        runningElement.addEventListener("mouseout", _this2.startAllAnimations.bind(_this2));
       });
     }
   }, {
-    key: 'makeRunningElementsFoolWidth',
+    key: "makeRunningElementsFoolWidth",
     value: function makeRunningElementsFoolWidth() {
-      this.list.style.setProperty('display', 'flex');
+      this.list.style.setProperty("display", "flex");
       this.runningElements.forEach(function (runningElement) {
-        runningElement.style.setProperty('flex', '1 0 auto');
+        runningElement.style.setProperty("flex", "1 0 auto");
       });
     }
   }, {
-    key: 'reset',
+    key: "reset",
     value: function reset() {
       var _this3 = this;
 
       this.runningElements.forEach(function (runningElement) {
-        runningElement.removeEventListener('mouseover', _this3.stopAllAnimations.bind(_this3));
-        runningElement.removeEventListener('mouseout', _this3.startAllAnimations.bind(_this3));
+        runningElement.removeEventListener("mouseover", _this3.stopAllAnimations.bind(_this3));
+        runningElement.removeEventListener("mouseout", _this3.startAllAnimations.bind(_this3));
         if (_this3.observer) {
           _this3.observer.unobserve(runningElement);
         }
@@ -109,7 +110,8 @@ var RunningLine = function () {
           animation.remove(animation.animatables[0].target);
         }
       });
-      this.overlay.style.setProperty('width', this.initialWidth + 'px');
+      this.overlay.style.removeProperty("width");
+      this.wrapper.style.removeProperty("width");
       this.animations = [];
       this.wrapper = null;
       this.list = null;
@@ -121,58 +123,58 @@ var RunningLine = function () {
       this.current = 0;
     }
   }, {
-    key: 'createOverlay',
+    key: "createOverlay",
     value: function createOverlay() {
-      this.overlay.style.setProperty('width', this.wrapper + 'px');
-      this.wrapper.style.setProperty('width', this.maxItemWidth + 5 + 'px');
-      this.overlay.style.setProperty('overflow', 'hidden');
+      this.overlay.style.setProperty("width", this.wrapperWidth + "px");
+      this.wrapper.style.setProperty("width", this.maxItemWidth + 5 + "px");
+      this.overlay.style.setProperty("overflow", "hidden");
       this.wrapperWidth = this.wrapper.getBoundingClientRect().width;
     }
   }, {
-    key: 'setItemsStyleProperties',
+    key: "setItemsStyleProperties",
     value: function setItemsStyleProperties() {
       if (this.maxItemWidth > this.wrapperWidth) {
         this.createOverlay();
       } else {
-        this.wrapper.style.setProperty('overflow', 'hidden');
+        this.wrapper.style.setProperty("overflow", "hidden");
       }
-      this.list.style.setProperty('position', 'relative');
-      this.list.style.setProperty('height', this.wrapperHeight + 'px');
-      this.list.style.setProperty('margin', '0');
-      this.list.style.setProperty('padding', '0');
+      this.list.style.setProperty("position", "relative");
+      this.list.style.setProperty("height", this.wrapperHeight + "px");
+      this.list.style.setProperty("margin", "0");
+      this.list.style.setProperty("padding", "0");
       this.listWidth = this.runningElements.reduce(function (sum, el) {
         return sum + el.getBoundingClientRect().width;
       }, 0);
       this.runningElements.forEach(function (el) {
-        el.style.setProperty('position', 'absolute');
+        el.style.setProperty("position", "absolute");
       });
-      this.list.style.setProperty('width', this.listWidth + 'px');
+      this.list.style.setProperty("width", this.listWidth + "px");
     }
   }, {
-    key: 'fixGap',
+    key: "fixGap",
     value: function fixGap() {
       var fixWidth = (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (2 * (this.runningElements.length - 1));
       this.runningElements.forEach(function (runningElement) {
-        var oldLeftpadding = +window.getComputedStyle(runningElement).getPropertyValue('padding-left').replace(/\w+/, '');
-        var oldRightpadding = +window.getComputedStyle(runningElement).getPropertyValue('padding-right').replace(/\w+/, '');
-        runningElement.style.setProperty('padding-right', oldRightpadding + fixWidth + 'px');
-        runningElement.style.setProperty('padding-left', oldLeftpadding + fixWidth + 'px');
+        var oldLeftpadding = +window.getComputedStyle(runningElement).getPropertyValue("padding-left").replace(/\w+/, "");
+        var oldRightpadding = +window.getComputedStyle(runningElement).getPropertyValue("padding-right").replace(/\w+/, "");
+        runningElement.style.setProperty("padding-right", oldRightpadding + fixWidth + "px");
+        runningElement.style.setProperty("padding-left", oldLeftpadding + fixWidth + "px");
       });
     }
   }, {
-    key: 'moveItemsToStartPosition',
+    key: "moveItemsToStartPosition",
     value: function moveItemsToStartPosition() {
       if (this.rightDirection) {
-        this.list.style.setProperty('right', -this.wrapperWidth + 'px');
+        this.list.style.setProperty("right", -this.wrapperWidth + "px");
       } else {
-        this.list.style.setProperty('left', -this.listWidth + 'px');
+        this.list.style.setProperty("left", -this.listWidth + "px");
         this.runningElements.forEach(function (runningElement) {
-          runningElement.style.setProperty('right', '0');
+          runningElement.style.setProperty("right", "0");
         });
       }
     }
   }, {
-    key: 'intersectionHandler',
+    key: "intersectionHandler",
     value: function intersectionHandler(entries) {
       var _this4 = this;
 
@@ -198,7 +200,7 @@ var RunningLine = function () {
       });
     }
   }, {
-    key: 'animate',
+    key: "animate",
     value: function animate(runningElement) {
       var _getWidthAndDuration = this.getWidthAndDuration(),
           width = _getWidthAndDuration.width;
@@ -209,25 +211,25 @@ var RunningLine = function () {
       width = !this.rightDirection ? width : -width;
       this.animations[this.current] = anime({
         targets: runningElement,
-        easing: 'linear',
+        easing: "linear",
         loop: 0,
         keyframes: [{ translateX: width, duration: duration }, { translateX: 0, duration: 0 }]
       });
     }
   }, {
-    key: 'getMaxTargetWidth',
+    key: "getMaxTargetWidth",
     value: function getMaxTargetWidth() {
       return this.runningElements.reduce(function (max, el) {
         return max < el.getBoundingClientRect().width ? el.getBoundingClientRect().width : max;
       }, 0);
     }
   }, {
-    key: 'getCurrentWidth',
+    key: "getCurrentWidth",
     value: function getCurrentWidth() {
       return this.runningElements[this.current].getBoundingClientRect().width;
     }
   }, {
-    key: 'getWidthAndDuration',
+    key: "getWidthAndDuration",
     value: function getWidthAndDuration() {
       var wid = this.wrapperWidth + this.getCurrentWidth();
       return {
@@ -236,7 +238,7 @@ var RunningLine = function () {
       };
     }
   }, {
-    key: 'stopAllAnimations',
+    key: "stopAllAnimations",
     value: function stopAllAnimations() {
       this.animations.forEach(function (animation) {
         if (animation && !animation.completed) {
@@ -245,7 +247,7 @@ var RunningLine = function () {
       });
     }
   }, {
-    key: 'startAllAnimations',
+    key: "startAllAnimations",
     value: function startAllAnimations() {
       this.animations.forEach(function (animation) {
         if (animation && !animation.completed) {
