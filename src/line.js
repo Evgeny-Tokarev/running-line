@@ -2,7 +2,6 @@ import anime from 'animejs/lib/anime';
 
 export default class RunningLine {
   constructor(duration, rightDirection, hoverStop, allocate) {
-    this.initialWidth = 0;
     this.animations = [];
     this.wrapper = null;
     this.list = null;
@@ -18,6 +17,7 @@ export default class RunningLine {
     this.hoverStop = hoverStop || false;
     this.allocate = allocate || false;
     this.maxItemWidth = 0;
+    this.rootMargin = '0px';
   }
 
   runLine(selector) {
@@ -33,9 +33,8 @@ export default class RunningLine {
     this.makeRunningElementsFoolWidth();
     this.wrapperWidth = this.overlay.getBoundingClientRect().width;
     this.wrapperHeight = this.overlay.getBoundingClientRect().height;
-    this.initialWidth = this.wrapperWidth;
+    this.maxItemWidth = this.getMaxRunningElementWidth();
     this.setItemsStyleProperties();
-    this.maxItemWidth = this.getMaxTargetWidth();
     this.moveItemsToStartPosition();
     if (this.wrapperWidth > this.listWidth - this.maxItemWidth && this.allocate) {
       this.fixGap();
@@ -43,7 +42,7 @@ export default class RunningLine {
     this.current = !this.rightDirection ? this.runningElements.length - 1 : 0;
     this.observer = new IntersectionObserver(this.intersectionHandler.bind(this), {
       root: this.wrapper,
-      rootMargin: '0px',
+      rootMargin: this.rootMargin,
       threshold: [1],
     });
     this.runningElements.forEach((runningElement) => {
@@ -74,7 +73,7 @@ export default class RunningLine {
   makeRunningElementsFoolWidth() {
     this.list.style.setProperty('display', 'flex');
     this.runningElements.forEach((runningElement) => {
-      runningElement.style.setProperty('flex', '1 0 auto');
+      runningElement.style.setProperty('flex', '0 0 auto');
     });
   }
 
@@ -105,7 +104,8 @@ export default class RunningLine {
     this.listWidth = 0;
     this.runningElements = [];
     this.current = 0;
-    this.maxItemWidth =0;
+    this.maxItemWidth = 0;
+    this.rootMargin = '0px';
   }
 
   createOverlay() {
@@ -119,7 +119,7 @@ export default class RunningLine {
     if (this.maxItemWidth > this.wrapperWidth) {
       this.createOverlay();
     } else {
-      this.wrapper.style.setProperty('overflow', 'hidden');
+        this.wrapper.style.setProperty('overflow', 'hidden');
     }
     this.list.style.setProperty('position', 'relative');
     this.list.style.setProperty('height', `${this.wrapperHeight}px`);
@@ -136,14 +136,20 @@ export default class RunningLine {
   }
 
   fixGap() {
-    const fixWidth =
-      (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (this.runningElements.length - 1);
+    const gap = this.wrapperWidth - this.listWidth + this.maxItemWidth;
+    const fixWidth = gap / this.runningElements.length;
+    this.listWidth = this.maxItemWidth + fixWidth;
+    this.list.style.setProperty('width', `${this.listWidth}px`);
+    const margin = this.rightDirection ? 'margin-right' : 'margin-left';
+    this.rootMargin = this.rightDirection
+      ? `0px ${-fixWidth}px 0px 0px`
+      : `0px 0px 0px ${-fixWidth}px`;
     this.runningElements.forEach((runningElement) => {
       const oldLeftMargin = +window
         .getComputedStyle(runningElement)
         .getPropertyValue('margin-left')
         .replace(/\w+/, '');
-      runningElement.style.setProperty('margin-left', `${oldLeftMargin + fixWidth}px`);
+      runningElement.style.setProperty(margin, `${oldLeftMargin + fixWidth}px`);
     });
   }
 
@@ -199,7 +205,7 @@ export default class RunningLine {
     });
   }
 
-  getMaxTargetWidth() {
+  getMaxRunningElementWidth() {
     return this.runningElements.reduce(
       (max, el) =>
         max < el.getBoundingClientRect().width ? el.getBoundingClientRect().width : max,
