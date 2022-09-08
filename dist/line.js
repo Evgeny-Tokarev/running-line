@@ -8,7 +8,6 @@ var RunningLine = function () {
   function RunningLine(duration, rightDirection, hoverStop, allocate) {
     _classCallCheck(this, RunningLine);
 
-    this.initialWidth = 0;
     this.animations = [];
     this.wrapper = null;
     this.list = null;
@@ -24,6 +23,7 @@ var RunningLine = function () {
     this.hoverStop = hoverStop || false;
     this.allocate = allocate || false;
     this.maxItemWidth = 0;
+    this.rootMargin = '0px';
   }
 
   _createClass(RunningLine, [{
@@ -43,9 +43,8 @@ var RunningLine = function () {
       this.makeRunningElementsFoolWidth();
       this.wrapperWidth = this.overlay.getBoundingClientRect().width;
       this.wrapperHeight = this.overlay.getBoundingClientRect().height;
-      this.initialWidth = this.wrapperWidth;
+      this.maxItemWidth = this.getMaxRunningElementWidth();
       this.setItemsStyleProperties();
-      this.maxItemWidth = this.getMaxTargetWidth();
       this.moveItemsToStartPosition();
       if (this.wrapperWidth > this.listWidth - this.maxItemWidth && this.allocate) {
         this.fixGap();
@@ -53,7 +52,7 @@ var RunningLine = function () {
       this.current = !this.rightDirection ? this.runningElements.length - 1 : 0;
       this.observer = new IntersectionObserver(this.intersectionHandler.bind(this), {
         root: this.wrapper,
-        rootMargin: '0px',
+        rootMargin: this.rootMargin,
         threshold: [1]
       });
       this.runningElements.forEach(function (runningElement) {
@@ -88,7 +87,7 @@ var RunningLine = function () {
     value: function makeRunningElementsFoolWidth() {
       this.list.style.setProperty('display', 'flex');
       this.runningElements.forEach(function (runningElement) {
-        runningElement.style.setProperty('flex', '1 0 auto');
+        runningElement.style.setProperty('flex', '0 0 auto');
       });
     }
   }, {
@@ -123,6 +122,7 @@ var RunningLine = function () {
       this.runningElements = [];
       this.current = 0;
       this.maxItemWidth = 0;
+      this.rootMargin = '0px';
     }
   }, {
     key: 'createOverlay',
@@ -155,10 +155,15 @@ var RunningLine = function () {
   }, {
     key: 'fixGap',
     value: function fixGap() {
-      var fixWidth = (this.wrapperWidth - this.listWidth + this.maxItemWidth) / (this.runningElements.length - 1);
+      var gap = this.wrapperWidth - this.listWidth + this.maxItemWidth;
+      var fixWidth = gap / this.runningElements.length;
+      this.listWidth = this.maxItemWidth + fixWidth;
+      this.list.style.setProperty('width', this.listWidth + 'px');
+      var margin = this.rightDirection ? 'margin-right' : 'margin-left';
+      this.rootMargin = this.rightDirection ? '0px ' + -fixWidth + 'px 0px 0px' : '0px 0px 0px ' + -fixWidth + 'px';
       this.runningElements.forEach(function (runningElement) {
         var oldLeftMargin = +window.getComputedStyle(runningElement).getPropertyValue('margin-left').replace(/\w+/, '');
-        runningElement.style.setProperty('margin-left', oldLeftMargin + fixWidth + 'px');
+        runningElement.style.setProperty(margin, oldLeftMargin + fixWidth + 'px');
       });
     }
   }, {
@@ -217,8 +222,8 @@ var RunningLine = function () {
       });
     }
   }, {
-    key: 'getMaxTargetWidth',
-    value: function getMaxTargetWidth() {
+    key: 'getMaxRunningElementWidth',
+    value: function getMaxRunningElementWidth() {
       return this.runningElements.reduce(function (max, el) {
         return max < el.getBoundingClientRect().width ? el.getBoundingClientRect().width : max;
       }, 0);

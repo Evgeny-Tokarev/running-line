@@ -1,4 +1,4 @@
-import anime from 'animejs/lib/anime';
+import anime from 'animejs/lib/anime.js';
 
 export default class RunningLine {
   constructor(duration, rightDirection, hoverStop, allocate) {
