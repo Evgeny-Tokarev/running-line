@@ -1,4 +1,4 @@
-const anime = require('animejs/lib/anime.min.js');
+import anime from 'animejs/lib/anime.min.js';
 
 export default class RunningLine {
   constructor(duration, rightDirection, hoverStop, allocate) {

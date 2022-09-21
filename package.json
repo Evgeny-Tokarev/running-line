@@ -1,9 +1,10 @@
 {
   "name": "running-line",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "JS running-line widget",
   "repository": "https://github.com/Evgeny-Tokarev/running-line",
   "main": "dist/line.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel ./src -d ./dist",
