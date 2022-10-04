@@ -3,6 +3,10 @@
 
 ## Running-line javaScript widget.
 
+
+[Screencast 2022-10-04 22-55-13.webm](https://user-images.githubusercontent.com/53691875/193903177-432189f5-8a40-43d6-aaa7-f8962ec88a67.webm)
+
+
 ### Installation:
 
 > npm install running-line
