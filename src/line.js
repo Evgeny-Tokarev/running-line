@@ -70,7 +70,7 @@ module.exports = class RunningLine {
     });
   }
 
-  makeRunningElementsFoolWidth() {
+  makeRunningElementsFullWidth() {
     this.list.style.setProperty('display', 'flex');
     this.runningElements.forEach((runningElement) => {
       runningElement.style.setProperty('flex', '0 0 auto');
